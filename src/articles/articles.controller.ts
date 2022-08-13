@@ -14,22 +14,22 @@ export class ArticlesController {
   constructor(private articlesService: ArticlesService) {}
   @Get()
   getAll() {
-    return 'All Articles';
+    return this.articlesService.getAll();
   }
-  @Get()
+  @Get(':articleId')
   getArticle(@Param('articleId') articleId: number) {
-    return 'an article with a spcific id';
+    return this.articlesService.getArticle(articleId);
   }
   @Post()
   addArticle(@Body() articleBody) {
-    return 'adds an article';
+    return this.articlesService.addArticle(articleBody);
   }
   @Patch()
   updateArticle(@Param('articleId') articleId: number) {
-    return 'updtes an article';
+    return this.articlesService.updateArticle(articleId);
   }
   @Delete()
   deleteArticle(@Param('articleId') articleId: number) {
-    return 'deletes an article';
+    return this.articlesService.deleteArticle(articleId);
   }
 }

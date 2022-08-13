@@ -6,15 +6,15 @@ export class ArticlesService {
     return 'an array of articles less than or equal to 10';
   }
   getArticle(articleId: number) {
-    return 'an article with a spcific id';
+    return `an article with an id of ${articleId}`;
   }
-  addArticle(body) {
-    return 'adds an article';
+  addArticle(articleBody) {
+    return `add an article with a body of ${articleBody}`;
   }
-  updateArticle(body) {
-    return 'updtes an article';
+  updateArticle(articleId) {
+    return `updates an article with an id of ${articleId}`;
   }
-  deleteArticle(body) {
-    return 'deletes an article';
+  deleteArticle(articleId) {
+    return `deletes an article with an id of ${articleId}`;
   }
 }
