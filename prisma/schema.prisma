@@ -20,7 +20,7 @@ model Journalist {
   position      String
   authors       Article[] @relation("authors")
   graphicArtist Article[] @relation("graphic_artist")
-  @@map("writers")
+  @@map("journalists")
 }
 
 model Article {
@@ -29,11 +29,10 @@ model Article {
 
   headline            String
   body                String
-  author              String
   author_id           Int
-  graphic_artist_id   Int
-  graphic_artist      Journalist @relation(name: "graphic_artist", fields: [graphic_artist_id], references: [id])
-  authors             Journalist @relation(name: "authors", fields: [author_id], references: [id])
+  graphics_artist_id  Int
+  graphics_artist     Journalist @relation(name: "graphic_artist", fields: [graphics_artist_id], references: [id], onDelete: Cascade)
+  authors             Journalist @relation(name: "authors", fields: [author_id], references: [id], onDelete: Cascade)
   photos              Photo[]
   @@map("articles")
 }
@@ -42,6 +41,6 @@ model Photo{
   id Int @id @default(autoincrement())
   url String
   article_id Int
-  article Article @relation(fields: [article_id], references: [id])
+  article Article @relation(fields: [article_id], references: [id], onDelete: Cascade)
   @@map("photos")
 }
