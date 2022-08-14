@@ -8,6 +8,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { ArticlesService } from './articles.service';
+import { ArticleDto } from './dto';
 
 @Controller('articles')
 export class ArticlesController {
@@ -21,7 +22,7 @@ export class ArticlesController {
     return this.articlesService.getArticle(articleId);
   }
   @Post()
-  addArticle(@Body() articleBody) {
+  addArticle(@Body() articleBody: ArticleDto) {
     return this.articlesService.addArticle(articleBody);
   }
   @Patch()
