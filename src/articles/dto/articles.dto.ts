@@ -1,4 +1,4 @@
-import { IsArray, IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 export class ArticleDto {
   @IsNotEmpty()
@@ -10,15 +10,12 @@ export class ArticleDto {
   body: string;
 
   @IsNotEmpty()
-  @IsString()
-  writer: string;
-
-  @IsString()
-  graphicsArtist: string;
+  @IsInt()
+  author_id: number;
 
   @IsNotEmpty()
-  @IsString()
-  createdAt: string;
+  @IsInt()
+  graphics_artist_id: number;
 
   @IsNotEmpty()
   @IsArray()
