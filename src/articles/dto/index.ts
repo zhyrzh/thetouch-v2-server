@@ -1,1 +1,1 @@
-export * from './articles.dto';
+export * from './addArticle.dto';

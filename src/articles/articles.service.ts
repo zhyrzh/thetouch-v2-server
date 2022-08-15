@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { cloudinary } from 'src/utils/cloudinary';
 import { PrismaService } from '../prisma/prisma.service';
-import { cloudinary } from '../utils/cloudinary';
+import { AddArticleDto } from './dto';
+// import { cloudinary } from '../utils/cloudinary';
 
 @Injectable()
 export class ArticlesService {
@@ -8,30 +10,36 @@ export class ArticlesService {
   async getAll() {
     return 'an array of articles less than or equal to 10';
   }
+  // GET a specific article
   getArticle(articleId: number) {
     return `an article with an id of ${articleId}`;
   }
-  async addArticle(articleBody) {
-    const photos: Array<string> = articleBody.photos;
-    delete articleBody.photos;
-    const { id } = await this.prisma.article.create({
-      data: articleBody,
-    });
-    for (const photo of photos) {
+  // POST a new article
+  async addArticle(articleBody: AddArticleDto) {
+    const uploadedPhotos: string[] = [];
+    for (const photo of articleBody.photos) {
       const { public_id } = await cloudinary.uploader.upload(photo, {
         upload_preset: 'uu8ywkkv',
       });
-      await this.prisma.$transaction([
-        this.prisma.photo.create({
-          data: {
-            url: public_id,
-            article_id: id,
-          },
-        }),
-      ]);
+      uploadedPhotos.push(public_id);
     }
+    const transformedUploadedPhotos = uploadedPhotos.map((photo) => ({
+      url: photo,
+    }));
+    delete articleBody.photos;
 
-    return id;
+    const createdPost = await this.prisma.article.create({
+      data: {
+        ...articleBody,
+        photos: {
+          createMany: {
+            data: [...transformedUploadedPhotos],
+          },
+        },
+      },
+    });
+
+    return createdPost;
   }
   updateArticle(articleId) {
     return `updates an article with an id of ${articleId}`;
