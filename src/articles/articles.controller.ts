@@ -4,11 +4,12 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
 } from '@nestjs/common';
 import { ArticlesService } from './articles.service';
-import { AddArticleDto } from './dto';
+import { AddArticleDto, UpdateArticleDto } from './dto';
 
 @Controller('articles')
 export class ArticlesController {
@@ -25,12 +26,15 @@ export class ArticlesController {
   addArticle(@Body() articleBody: AddArticleDto) {
     return this.articlesService.addArticle(articleBody);
   }
-  @Patch()
-  updateArticle(@Param('articleId') articleId: number) {
-    return this.articlesService.updateArticle(articleId);
+  @Patch(':articleId')
+  updateArticle(
+    @Param('articleId', ParseIntPipe) articleId: number,
+    @Body() articleBody: UpdateArticleDto,
+  ) {
+    return this.articlesService.updateArticle(articleId, articleBody);
   }
-  @Delete()
-  deleteArticle(@Param('articleId') articleId: number) {
+  @Delete(':articleId')
+  deleteArticle(@Param('articleId', ParseIntPipe) articleId: number) {
     return this.articlesService.deleteArticle(articleId);
   }
 }
