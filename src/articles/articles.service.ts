@@ -7,7 +7,7 @@ import { AddArticleDto, UpdateArticleDto } from './dto';
 @Injectable()
 export class ArticlesService {
   constructor(private prisma: PrismaService) {}
-  async getAll() {
+  async getAllArticles() {
     return 'an array of articles less than or equal to 10';
   }
   // GET a specific article
@@ -23,9 +23,12 @@ export class ArticlesService {
       });
       uploadedPhotos.push(public_id);
     }
-    const transformedUploadedPhotos = uploadedPhotos.map((photo) => ({
+    const transformedUploadedPhotos = articleBody.photos.map((photo) => ({
       url: photo,
     }));
+    // const transformedUploadedPhotos = uploadedPhotos.map((photo) => ({
+    //   url: photo,
+    // }));
     delete articleBody.photos;
 
     const createdPost = await this.prisma.article.create({
@@ -41,6 +44,7 @@ export class ArticlesService {
 
     return createdPost;
   }
+  // PATCH updates an article
   async updateArticle(articleId, articleBody: UpdateArticleDto) {
     // removedPhotos property -> Array
     // addedPhotos property -> Array
@@ -87,7 +91,35 @@ export class ArticlesService {
 
     return `updates an article with an id of ${articleId}`;
   }
-  deleteArticle(articleId) {
-    return `deletes an article with an id of ${articleId}`;
+  // DELETE an article
+  async deleteArticle(articleId) {
+    const [toBeDeletedPhotos, deletedArticle] = await this.prisma.$transaction([
+      this.prisma.articlePhotos.findMany({
+        where: {
+          article_id: articleId,
+        },
+        select: {
+          url: true,
+        },
+      }),
+      this.prisma.article.delete({
+        where: {
+          id: articleId,
+        },
+      }),
+      this.prisma.articlePhotos.deleteMany({
+        where: {
+          article_id: articleId,
+        },
+      }),
+    ]);
+
+    for (const photo of toBeDeletedPhotos) {
+      await cloudinary.uploader.destroy(photo.url, (result) => {
+        console.log(`Photo successfully deleted ${result}`);
+      });
+    }
+
+    console.log(deletedArticle);
   }
 }
