@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { cloudinary } from 'src/utils/cloudinary';
 import { PrismaService } from '../prisma/prisma.service';
 import { AddArticleDto, UpdateArticleDto } from './dto';
@@ -7,13 +7,34 @@ import { AddArticleDto, UpdateArticleDto } from './dto';
 @Injectable()
 export class ArticlesService {
   constructor(private prisma: PrismaService) {}
-  async getAllArticles() {
-    return 'an array of articles less than or equal to 10';
+
+  // GET all articles with LIMIT = 10
+  async getAllArticlesWithPagination(skip) {
+    const articles = await this.prisma.article.findMany({
+      include: {
+        photos: true,
+      },
+      skip,
+      take: 10,
+    });
+    return articles;
   }
+
   // GET a specific article
-  getArticle(articleId: number) {
-    return `an article with an id of ${articleId}`;
+  async getArticle(articleId: number) {
+    const foundArticle = await this.prisma.article.findUnique({
+      where: {
+        id: articleId,
+      },
+    });
+
+    if (foundArticle === null) {
+      throw new NotFoundException('No user found');
+    }
+
+    return foundArticle;
   }
+
   // POST a new article
   async addArticle(articleBody: AddArticleDto) {
     const uploadedPhotos: string[] = [];
@@ -23,12 +44,10 @@ export class ArticlesService {
       });
       uploadedPhotos.push(public_id);
     }
-    const transformedUploadedPhotos = articleBody.photos.map((photo) => ({
+
+    const transformedUploadedPhotos = uploadedPhotos.map((photo) => ({
       url: photo,
     }));
-    // const transformedUploadedPhotos = uploadedPhotos.map((photo) => ({
-    //   url: photo,
-    // }));
     delete articleBody.photos;
 
     const createdPost = await this.prisma.article.create({
@@ -44,10 +63,9 @@ export class ArticlesService {
 
     return createdPost;
   }
+
   // PATCH updates an article
   async updateArticle(articleId, articleBody: UpdateArticleDto) {
-    // removedPhotos property -> Array
-    // addedPhotos property -> Array
     const addedPhotosLength = articleBody.addedPhotos.length;
     const removedPhotos = articleBody.removedPhotos;
     for (const photo of articleBody.removedPhotos) {
