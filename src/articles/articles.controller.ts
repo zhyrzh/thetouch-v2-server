@@ -14,9 +14,9 @@ import { AddArticleDto, UpdateArticleDto } from './dto';
 @Controller('articles')
 export class ArticlesController {
   constructor(private articlesService: ArticlesService) {}
-  @Get()
-  getAll() {
-    return this.articlesService.getAll();
+  @Get('pagination/:skip')
+  getAllArticles(@Param('skip', ParseIntPipe) skip: number) {
+    return this.articlesService.getAllArticlesWithPagination(skip);
   }
   @Get(':articleId')
   getArticle(@Param('articleId') articleId: number) {
