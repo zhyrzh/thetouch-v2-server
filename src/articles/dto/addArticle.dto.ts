@@ -14,6 +14,14 @@ export class AddArticleDto {
   body: string;
 
   @IsNotEmpty()
+  @IsString()
+  graphics_by: string;
+
+  @IsNotEmpty()
+  @IsString()
+  authored_by: string;
+
+  @IsNotEmpty()
   @IsInt()
   author_id: number;
 
