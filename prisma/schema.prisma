@@ -30,13 +30,13 @@ model Article {
   headline String
   body     String
 
-  authord_by  String
-  graphics_by String
-
   author             Journalist @relation(name: "authored_articles", fields: [author_id], references: [id], onDelete: Cascade)
   author_id          Int
   graphics_artist    Journalist @relation(name: "graphics_articles", fields: [graphics_artist_id], references: [id], onDelete: Cascade)
   graphics_artist_id Int
+
+  authored_by String
+  graphics_by String
 
   photos ArticlePhotos[]
 
