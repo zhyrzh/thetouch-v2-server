@@ -1,4 +1,5 @@
-import { IsArray, IsInt, IsNotEmpty, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsArray, IsNotEmpty, IsString } from 'class-validator';
 
 export class AddArticleDto {
   @IsNotEmpty()
@@ -22,11 +23,11 @@ export class AddArticleDto {
   authored_by: string;
 
   @IsNotEmpty()
-  @IsInt()
+  @Transform(({ value }) => parseInt(value))
   author_id: number;
 
   @IsNotEmpty()
-  @IsInt()
+  @Transform(({ value }) => parseInt(value))
   graphics_artist_id: number;
 
   @IsNotEmpty()
