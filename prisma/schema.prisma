@@ -11,36 +11,41 @@ datasource db {
 }
 
 model Journalist {
-  id            Int      @id @default(autoincrement())
-  createdAt     DateTime @default(now())
+  id               Int       @id @default(autoincrement())
+  first_name       String
+  last_name        String
+  course           String
+  position         String
+  photo            String
+  authoredArticles Article[] @relation(name: "authored_articles")
+  graphicsArticles Article[] @relation(name: "graphics_articles")
 
-  first_name    String
-  last_name     String
-  course        String
-  position      String
-  authors       Article[] @relation("authors")
-  graphicArtist Article[] @relation("graphic_artist")
   @@map("journalists")
 }
 
 model Article {
-  id                  Int      @id @default(autoincrement())
-  createdAt           DateTime @default(now())
+  id Int @id @default(autoincrement())
 
-  headline            String
-  body                String
-  author_id           Int
-  graphics_artist_id  Int
-  graphics_artist     Journalist @relation(name: "graphic_artist", fields: [graphics_artist_id], references: [id], onDelete: Cascade)
-  authors             Journalist @relation(name: "authors", fields: [author_id], references: [id], onDelete: Cascade)
-  photos              Photo[]
+  category String
+  headline String
+  body     String
+
+  author             Journalist @relation(name: "authored_articles", fields: [author_id], references: [id])
+  author_id          Int
+  graphics_artist    Journalist @relation(name: "graphics_articles", fields: [graphics_artist_id], references: [id])
+  graphics_artist_id Int
+
+  photos ArticlePhotos[]
+
   @@map("articles")
 }
 
-model Photo{
+model ArticlePhotos {
   id Int @id @default(autoincrement())
-  url String
-  article_id Int
-  article Article @relation(fields: [article_id], references: [id], onDelete: Cascade)
-  @@map("photos")
+
+  url        String
+  article_id Int?
+  article    Article? @relation(fields: [article_id], references: [id])
+
+  @@map("article_photos")
 }
