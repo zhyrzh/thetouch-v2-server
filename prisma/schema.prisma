@@ -30,9 +30,12 @@ model Article {
   headline String
   body     String
 
-  author             Journalist @relation(name: "authored_articles", fields: [author_id], references: [id])
+  authord_by  String
+  graphics_by String
+
+  author             Journalist @relation(name: "authored_articles", fields: [author_id], references: [id], onDelete: Cascade)
   author_id          Int
-  graphics_artist    Journalist @relation(name: "graphics_articles", fields: [graphics_artist_id], references: [id])
+  graphics_artist    Journalist @relation(name: "graphics_articles", fields: [graphics_artist_id], references: [id], onDelete: Cascade)
   graphics_artist_id Int
 
   photos ArticlePhotos[]
@@ -45,7 +48,7 @@ model ArticlePhotos {
 
   url        String
   article_id Int?
-  article    Article? @relation(fields: [article_id], references: [id])
+  article    Article? @relation(fields: [article_id], references: [id], onDelete: Cascade)
 
   @@map("article_photos")
 }
