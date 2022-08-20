@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import * as dayjs from 'dayjs';
 import { cloudinary } from 'src/utils/cloudinary';
 import { PrismaService } from '../prisma/prisma.service';
 import { AddArticleDto, UpdateArticleDto } from './dto';
@@ -48,11 +49,16 @@ export class ArticlesService {
     const transformedUploadedPhotos = uploadedPhotos.map((photo) => ({
       url: photo,
     }));
+
+    const body = {
+      ...articleBody,
+      createdAt: dayjs(articleBody.createdAt).format(),
+    };
     delete articleBody.photos;
 
     const createdPost = await this.prisma.article.create({
       data: {
-        ...articleBody,
+        ...body,
         photos: {
           createMany: {
             data: [...transformedUploadedPhotos],
