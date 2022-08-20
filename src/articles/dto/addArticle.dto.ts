@@ -4,6 +4,10 @@ import { IsArray, IsNotEmpty, IsString } from 'class-validator';
 export class AddArticleDto {
   @IsNotEmpty()
   @IsString()
+  createdAt: string;
+
+  @IsNotEmpty()
+  @IsString()
   category: string;
 
   @IsNotEmpty()
@@ -24,11 +28,11 @@ export class AddArticleDto {
 
   @IsNotEmpty()
   @Transform(({ value }) => parseInt(value))
-  author_id: number;
+  authored_by_id: number;
 
   @IsNotEmpty()
   @Transform(({ value }) => parseInt(value))
-  graphics_artist_id: number;
+  graphics_by_id: number;
 
   @IsNotEmpty()
   @IsArray()
