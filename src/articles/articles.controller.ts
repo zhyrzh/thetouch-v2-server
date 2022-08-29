@@ -7,7 +7,11 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
 import { ArticlesService } from './articles.service';
 import { AddArticleDto, UpdateArticleDto } from './dto';
 
@@ -22,10 +26,13 @@ export class ArticlesController {
   getArticle(@Param('articleId') articleId: number) {
     return this.articlesService.getArticle(articleId);
   }
+  @UseGuards(AuthGuard('jwt'))
   @Post()
-  addArticle(@Body() articleBody: AddArticleDto) {
+  addArticle(@Body() articleBody: AddArticleDto, @Req() req: Request) {
+    console.log(req.user);
     return this.articlesService.addArticle(articleBody);
   }
+  @UseGuards(AuthGuard('jwt'))
   @Patch(':articleId')
   updateArticle(
     @Param('articleId', ParseIntPipe) articleId: number,
@@ -33,6 +40,7 @@ export class ArticlesController {
   ) {
     return this.articlesService.updateArticle(articleId, articleBody);
   }
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':articleId')
   deleteArticle(@Param('articleId', ParseIntPipe) articleId: number) {
     return this.articlesService.deleteArticle(articleId);
