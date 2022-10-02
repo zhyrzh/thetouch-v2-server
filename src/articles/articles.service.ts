@@ -40,10 +40,10 @@ export class ArticlesService {
   async addArticle(articleBody: AddArticleDto) {
     const uploadedPhotos: string[] = [];
     for (const photo of articleBody.photos) {
-      const { public_id } = await cloudinary.uploader.upload(photo, {
+      const res = await cloudinary.uploader.upload(photo, {
         upload_preset: 'uu8ywkkv',
       });
-      uploadedPhotos.push(public_id);
+      uploadedPhotos.push(res.url);
     }
 
     const transformedUploadedPhotos = uploadedPhotos.map((photo) => ({
