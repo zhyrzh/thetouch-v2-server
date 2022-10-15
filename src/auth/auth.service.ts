@@ -53,6 +53,10 @@ export class AuthService {
     return this.signToken(createdAdmin.username);
   }
 
+  async authenticate() {
+    return 'authenticated';
+  }
+
   async signToken(username: string) {
     const token = await this.jwt.signAsync(
       { username },
