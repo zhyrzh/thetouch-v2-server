@@ -24,15 +24,12 @@ export class JournalistsService {
   }
   // POST AddJournalist Service
   async addJournalist(journalistBody: AddJournalistDto) {
-    const { public_id } = await cloudinary.uploader.upload(
-      journalistBody.photo,
-      {
-        upload_preset: 'uu8ywkkv',
-      },
-    );
+    const { url } = await cloudinary.uploader.upload(journalistBody.photo, {
+      upload_preset: 'uu8ywkkv',
+    });
     const journalistData = {
       ...journalistBody,
-      photo: public_id,
+      photo: url,
     };
     const addedJournalist = await this.prisma.journalist.create({
       data: journalistData,
