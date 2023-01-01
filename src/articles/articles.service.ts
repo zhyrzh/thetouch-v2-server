@@ -157,6 +157,6 @@ export class ArticlesService {
       });
     }
 
-    console.log(deletedArticle);
+    return deletedArticle;
   }
 }
