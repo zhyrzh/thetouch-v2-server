@@ -9,6 +9,19 @@ import { AddArticleDto, UpdateArticleDto } from './dto';
 export class ArticlesService {
   constructor(private prisma: PrismaService) {}
 
+  async getArticlesForHomePage() {
+    const articles = await this.prisma.article.findMany({
+      include: {
+        photos: true,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+      take: 4,
+    });
+    return articles;
+  }
+
   // GET all articles with LIMIT = 10
   async getAllArticlesWithPagination(skip) {
     const articles = await this.prisma.article.findMany({

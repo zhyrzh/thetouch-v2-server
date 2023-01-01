@@ -18,6 +18,10 @@ import { AddArticleDto, UpdateArticleDto } from './dto';
 @Controller('articles')
 export class ArticlesController {
   constructor(private articlesService: ArticlesService) {}
+  @Get('/')
+  getArticlesForHomePage() {
+    return this.articlesService.getArticlesForHomePage();
+  }
   @Get('pagination/:skip')
   getAllArticles(@Param('skip', ParseIntPipe) skip: number) {
     return this.articlesService.getAllArticlesWithPagination(skip);
