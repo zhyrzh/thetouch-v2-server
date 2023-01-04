@@ -3,6 +3,10 @@ import { IsArray, IsInt, IsOptional, IsString } from 'class-validator';
 export class UpdateArticleDto {
   @IsOptional()
   @IsString()
+  createdAt?: string;
+
+  @IsOptional()
+  @IsString()
   category?: string;
 
   @IsOptional()
