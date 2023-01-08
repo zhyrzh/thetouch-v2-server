@@ -55,6 +55,7 @@ model ArticlePhotos {
   url        String
   article_id Int?
   article    Article? @relation(fields: [article_id], references: [id], onDelete: Cascade)
+  public_id  String
 
   @@map("article_photos")
 }
