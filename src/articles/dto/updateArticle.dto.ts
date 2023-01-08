@@ -27,7 +27,10 @@ export class UpdateArticleDto {
 
   @IsOptional()
   @IsArray()
-  removedPhotos?: Array<string>;
+  removedPhotos?: {
+    id: string;
+    url: string;
+  }[];
 
   @IsOptional()
   @IsArray()
