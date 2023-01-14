@@ -51,17 +51,20 @@ export class ArticlesService {
 
   // POST a new article
   async addArticle(articleBody: AddArticleDto) {
-    const uploadedPhotos: string[] = [];
+    const uploadedPhotos: Array<{ url: string; public_id: string }> = [];
     for (const photo of articleBody.photos) {
       const res = await cloudinary.uploader.upload(photo, {
         upload_preset: 'uu8ywkkv',
       });
-      uploadedPhotos.push(res.url);
+      uploadedPhotos.push({ url: res.url, public_id: res.public_id });
     }
 
-    const transformedUploadedPhotos = uploadedPhotos.map((photo) => ({
-      url: photo,
-    }));
+    const transformedUploadedPhotos = uploadedPhotos.map(
+      ({ public_id, url }) => ({
+        url,
+        public_id,
+      }),
+    );
 
     const body = {
       ...articleBody,
@@ -86,45 +89,67 @@ export class ArticlesService {
   // PATCH updates an article
   async updateArticle(articleId, articleBody: UpdateArticleDto) {
     const addedPhotosLength = articleBody.addedPhotos.length;
-    const removedPhotos = articleBody.removedPhotos;
-    for (const photo of articleBody.removedPhotos) {
-      await cloudinary.uploader.destroy(photo, (result) => {
-        console.log(`Photo successfully deleted ${result}`);
-      });
+    const removedPhotoIds = articleBody.removedPhotos.map((photo) => photo.id);
+
+    if (articleBody.removedPhotos.length >= 1) {
+      for (const photo of articleBody.removedPhotos) {
+        await cloudinary.uploader.destroy(photo.url, (result) => {
+          console.log(`Photo successfully deleted ${result}`);
+        });
+      }
     }
-    let toBeUploadedPhotos: Array<{ url: string }> = [];
+
+    const uploadedPhotos: Array<{ url: string; public_id: string }> = [];
     if (articleBody.addedPhotos.length >= 1) {
-      toBeUploadedPhotos = articleBody.addedPhotos.map((photo) => ({
-        url: photo,
-      }));
+      let toBeUploadedPhotos: Array<{ url: string }> = [];
+      if (articleBody.addedPhotos.length >= 1) {
+        toBeUploadedPhotos = articleBody.addedPhotos.map((photo) => ({
+          url: photo,
+        }));
+        for (const photo of toBeUploadedPhotos) {
+          try {
+            const res = await cloudinary.uploader.upload(photo.url, {
+              upload_preset: 'uu8ywkkv',
+            });
+            uploadedPhotos.push({ url: res.url, public_id: res.public_id });
+          } catch (error) {
+            console.log('hitted, 2');
+          }
+        }
+      }
     }
+
     delete articleBody.addedPhotos;
     delete articleBody.removedPhotos;
-    await this.prisma.$transaction([
-      this.prisma.articlePhotos.deleteMany({
-        where: {
-          url: {
-            in: removedPhotos,
-          },
-        },
-      }),
-      this.prisma.article.update({
-        include: {
-          photos: addedPhotosLength >= 1,
-        },
-        where: {
-          id: articleId,
-        },
-        data: {
-          ...articleBody,
-          photos: {
-            createMany: {
-              data: [...toBeUploadedPhotos],
+    try {
+      await this.prisma.$transaction([
+        this.prisma.articlePhotos.deleteMany({
+          where: {
+            url: {
+              in: removedPhotoIds,
             },
           },
-        },
-      }),
-    ]);
+        }),
+        this.prisma.article.update({
+          include: {
+            photos: addedPhotosLength >= 1,
+          },
+          where: {
+            id: articleId,
+          },
+          data: {
+            ...articleBody,
+            photos: {
+              createMany: {
+                data: [...uploadedPhotos],
+              },
+            },
+          },
+        }),
+      ]);
+    } catch (error) {
+      console.log('hitted, 3');
+    }
 
     return `updates an article with an id of ${articleId}`;
   }
