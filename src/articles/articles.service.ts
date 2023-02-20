@@ -153,6 +153,17 @@ export class ArticlesService {
 
     return `updates an article with an id of ${articleId}`;
   }
+  async approveArticle(articleId) {
+    const updatedArticle = await this.prisma.article.update({
+      where: {
+        id: articleId,
+      },
+      data: {
+        isApproved: true,
+      },
+    });
+    return updatedArticle;
+  }
   // DELETE an article
   async deleteArticle(articleId) {
     const [toBeDeletedPhotos, deletedArticle] = await this.prisma.$transaction([
