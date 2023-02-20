@@ -44,6 +44,8 @@ model Article {
   authored_by String
   graphics_by String
 
+  isApproved Boolean? @default(false)
+
   photos ArticlePhotos[]
 
   @@map("articles")
